@@ -19,6 +19,8 @@ paths:
         - Volunteer
       operationId: registerMe
       summary: Регистрация волонтёра
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
       requestBody:
         required: true
         content:
