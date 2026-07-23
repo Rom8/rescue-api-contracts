@@ -1,0 +1,10 @@
+openapi: 3.1.0
+info:
+  title: Incident Service API
+  description: Контракт API сервиса управления инцидентами.
+  version: 0.0.1
+servers:
+  - url: http://localhost:8080
+paths: {}
+components:
+  schemas: {}

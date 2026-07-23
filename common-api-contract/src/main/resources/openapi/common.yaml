@@ -1,0 +1,8 @@
+openapi: 3.1.0
+info:
+  title: Rescue Common API
+  description: Общие типы и контрактные компоненты сервисов Rescue.
+  version: 0.0.1
+paths: {}
+components:
+  schemas: {}
