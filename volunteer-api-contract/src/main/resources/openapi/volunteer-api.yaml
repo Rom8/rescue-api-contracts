@@ -333,6 +333,12 @@ components:
         locationId:
           type: integer
           format: int64
+        settlementName:
+          type: string
+          maxLength: 255
+        settlementDistrictName:
+          type: string
+          maxLength: 255
         currentIncidentId:
           type: string
           format: uuid
