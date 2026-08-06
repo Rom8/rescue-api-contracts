@@ -16,6 +16,7 @@
         <module>common-api-contract</module>
         <module>volunteer-api-contract</module>
         <module>incident-api-contract</module>
+        <module>tracking-api-contract</module>
     </modules>
 
     <properties>
