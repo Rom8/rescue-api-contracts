@@ -61,9 +61,8 @@ paths:
           required: true
           description: Идентификатор волонтёра
           schema:
-            type: integer
-            format: int64
-            minimum: 1
+            type: string
+            format: uuid
       responses:
         '200':
           description: Текущие координаты волонтёра
@@ -132,9 +131,8 @@ components:
         - lon
       properties:
         volunteerId:
-          type: integer
-          format: int64
-          minimum: 1
+          type: string
+          format: uuid
           description: Идентификатор волонтёра
         lat:
           $ref: '#/components/schemas/Latitude'
@@ -188,9 +186,8 @@ components:
           type: array
           minItems: 1
           items:
-            type: integer
-            format: int64
-            minimum: 1
+            type: string
+            format: uuid
           description: Идентификаторы волонтёров
     VolunteerLocationDto:
       type: object
@@ -199,9 +196,8 @@ components:
         - volunteerId
       properties:
         volunteerId:
-          type: integer
-          format: int64
-          minimum: 1
+          type: string
+          format: uuid
           description: Идентификатор волонтёра
         lat:
           $ref: '#/components/schemas/Latitude'
