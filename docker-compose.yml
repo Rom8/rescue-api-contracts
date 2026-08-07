@@ -1,0 +1,18 @@
+services:
+  # swagger-ui — Веб-интерфейс Swagger UI для просмотра и интерактивного тестирования OpenAPI-спецификации сервиса
+  swagger-ui:
+    image: swaggerapi/swagger-ui:v5.32.7
+    container_name: rescue_service-swagger-ui
+    environment:
+      URLS: >-
+        [
+          {"name":"Volunteer API","url":"/openapi/volunteer-api.yaml"},
+          {"name":"Tracking API","url":"/openapi/tracking-api.yaml"}
+        ]
+    ports:
+      - "${SWAGGER_UI_PORT:-8091}:8080"
+    volumes:
+      - ./volunteer-api-contract/src/main/resources/openapi/volunteer-api.yaml:/usr/share/nginx/html/openapi/volunteer-api.yaml:ro
+      - ./tracking-api-contract/src/main/resources/openapi/tracking-api.yaml:/usr/share/nginx/html/openapi/tracking-api.yaml:ro
+
+
