@@ -14,5 +14,6 @@ services:
     volumes:
       - ./volunteer-api-contract/src/main/resources/openapi/volunteer-api.yaml:/usr/share/nginx/html/openapi/volunteer-api.yaml:ro
       - ./tracking-api-contract/src/main/resources/openapi/tracking-api.yaml:/usr/share/nginx/html/openapi/tracking-api.yaml:ro
+      - ./common-api-contract/src/main/resources/openapi/common.yaml:/usr/share/nginx/html/openapi/common.yaml:ro
 
 

@@ -5,4 +5,16 @@ info:
   version: 0.0.1
 paths: {}
 components:
-  schemas: {}
+  schemas:
+    Latitude:
+      type: number
+      format: double
+      minimum: -90
+      maximum: 90
+      description: Географическая широта
+    Longitude:
+      type: number
+      format: double
+      minimum: -180
+      maximum: 180
+      description: Географическая долгота
