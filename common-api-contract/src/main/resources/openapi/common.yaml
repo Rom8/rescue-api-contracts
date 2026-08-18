@@ -6,6 +6,12 @@ info:
 paths: {}
 components:
   schemas:
+    Gender:
+      type: string
+      description: Пол человека
+      enum:
+        - MALE
+        - FEMALE
     Latitude:
       type: number
       format: double
@@ -18,3 +24,30 @@ components:
       minimum: -180
       maximum: 180
       description: Географическая долгота
+    GeoPoint:
+      type: object
+      description: Географическая точка
+      required:
+        - lat
+        - lon
+      properties:
+        lat:
+          $ref: '#/components/schemas/Latitude'
+        lon:
+          $ref: '#/components/schemas/Longitude'
+    IncidentId:
+      type: string
+      format: uuid
+      description: Идентификатор инцидента
+    SettlementInfo:
+      type: object
+      description: Населённый пункт и его район
+      properties:
+        settlementName:
+          type: string
+          description: Название населённого пункта
+          maxLength: 255
+        settlementDistrictName:
+          type: string
+          description: Название района населённого пункта
+          maxLength: 255

@@ -5,6 +5,364 @@ info:
   version: 0.0.1
 servers:
   - url: http://localhost:8080
-paths: {}
+tags:
+  - name: Incident
+    description: API управления инцидентами
+paths:
+  /api/v1/incident/create:
+    post:
+      tags:
+        - Incident
+      operationId: createIncident
+      summary: Создание инцидента о пропавшем человеке
+      description: Повторное создание того же инцидента с тем же ключом идемпотентности отклоняется с ошибкой 409.
+      parameters:
+        - name: X-Idempotency-Key
+          in: header
+          required: true
+          description: Ключ идемпотентности запроса на создание инцидента.
+          schema:
+            type: string
+            minLength: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IncidentCreateRequest'
+      responses:
+        '201':
+          description: Инцидент успешно создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IncidentCreateResponse'
+        '400':
+          description: Некорректный запрос
+        '409':
+          description: Инцидент с указанным ключом идемпотентности уже создан
+  /api/v1/incident/list:
+    post:
+      tags:
+        - Incident
+      operationId: getIncidents
+      summary: Получение списка инцидентов
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IncidentListRequest'
+      responses:
+        '200':
+          description: Список инцидентов, соответствующих фильтрам
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IncidentListResponse'
+        '400':
+          description: Некорректные параметры фильтрации или пагинации
+  /api/v1/incident/volunteer/list:
+    post:
+      tags:
+        - Incident
+      operationId: getVolunteerIncidents
+      summary: Получение списка инцидентов, в которых участвовал волонтёр
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VolunteerIncidentListRequest'
+      responses:
+        '200':
+          description: Страница инцидентов, в которых участвовал волонтёр
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IncidentListResponse'
+        '400':
+          description: Некорректный идентификатор волонтёра или параметры пагинации
+  /api/v1/incident/volunteer/pending/list:
+    post:
+      tags:
+        - Incident
+      operationId: getVolunteerPendingIncidents
+      summary: Получение списка инцидентов, ожидающих ответа волонтёра
+      description: Возвращает инциденты, в которых волонтёру предложено участие, но он ещё не согласился и не отказался. После ответа волонтёра инцидент исключается из списка.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VolunteerIncidentListRequest'
+      responses:
+        '200':
+          description: Страница инцидентов, ожидающих ответа волонтёра
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IncidentListResponse'
+        '400':
+          description: Некорректный идентификатор волонтёра или параметры пагинации
+  /api/v1/incident/{id}:
+    get:
+      tags:
+        - Incident
+      operationId: getIncident
+      summary: Получение информации об инциденте
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Идентификатор инцидента
+          schema:
+            $ref: '#/components/schemas/IncidentId'
+      responses:
+        '200':
+          description: Информация об инциденте и участвующих в поиске волонтёрах
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IncidentDetailsResponse'
+        '400':
+          description: Некорректный идентификатор инцидента
+        '404':
+          description: Инцидент не найден
+  /api/v1/incident/status:
+    patch:
+      tags:
+        - Incident
+      operationId: updateIncidentStatus
+      summary: Обновление статуса инцидента
+      description: Статус инцидента в состоянии IN_PROGRESS может быть изменён только на SUCCESS или FAIL.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IncidentStatusUpdateRequest'
+      responses:
+        '204':
+          description: Статус инцидента успешно обновлён
+        '400':
+          description: Некорректный запрос или недопустимый статус для обновления
+        '404':
+          description: Инцидент не найден
+        '409':
+          description: Текущий статус инцидента не допускает обновление
 components:
-  schemas: {}
+  schemas:
+    VolunteerIncidentListRequest:
+      type: object
+      description: Идентификатор волонтёра и параметры пагинации его инцидентов
+      required:
+        - volunteerId
+        - pageFrom
+        - count
+      properties:
+        volunteerId:
+          $ref: '#/components/schemas/VolunteerId'
+        pageFrom:
+          type: integer
+          format: int32
+          description: Номер страницы, начиная с которой возвращаются записи
+          minimum: 0
+        count:
+          type: integer
+          format: int32
+          description: Количество записей на странице
+          minimum: 1
+    IncidentListRequest:
+      description: Фильтры и параметры пагинации для поиска инцидентов
+      allOf:
+        - $ref: '#/components/schemas/SettlementInfo'
+        - type: object
+          required:
+            - pageFrom
+            - count
+          properties:
+            year:
+              type: integer
+              format: int32
+              description: Год инцидента
+              minimum: 1
+            month:
+              type: integer
+              format: int32
+              description: Месяц инцидента
+              minimum: 1
+              maximum: 12
+            status:
+              $ref: '#/components/schemas/IncidentStatus'
+            pageFrom:
+              type: integer
+              format: int32
+              description: Номер страницы, начиная с которой возвращаются записи
+              minimum: 0
+            count:
+              type: integer
+              format: int32
+              description: Количество записей на странице
+              minimum: 1
+    IncidentListResponse:
+      type: object
+      description: Страница списка инцидентов
+      required:
+        - incidents
+      properties:
+        incidents:
+          type: array
+          description: Инциденты, соответствующие фильтрам
+          items:
+            $ref: '#/components/schemas/IncidentListItem'
+    IncidentListItem:
+      description: Краткая информация об инциденте
+      allOf:
+        - $ref: '#/components/schemas/IncidentInfo'
+    IncidentDetailsResponse:
+      description: Информация об инциденте и волонтёрах, участвующих в поиске
+      allOf:
+        - $ref: '#/components/schemas/IncidentInfo'
+        - type: object
+          required:
+            - volunteers
+          properties:
+            volunteers:
+              type: array
+              description: Волонтёры, участвующие в поиске, и их текущие координаты при наличии
+              items:
+                $ref: '#/components/schemas/IncidentVolunteerLocation'
+    IncidentInfo:
+      description: Основная информация об инциденте
+      allOf:
+        - $ref: '#/components/schemas/LastSeenInfo'
+        - type: object
+          required:
+            - incidentId
+            - missingPerson
+            - status
+          properties:
+            incidentId:
+              $ref: '#/components/schemas/IncidentId'
+            missingPerson:
+              $ref: '#/components/schemas/MissingPersonInfo'
+            status:
+              $ref: '#/components/schemas/IncidentStatus'
+    MissingPersonInfo:
+      type: object
+      description: Информация о пропавшем человеке
+      required:
+        - fullName
+        - gender
+        - age
+        - specialSigns
+        - clothing
+        - photoUrl
+      properties:
+        fullName:
+          type: string
+          description: Фамилия, имя, отчество пропавшего человека
+          minLength: 1
+          maxLength: 255
+        gender:
+          $ref: '#/components/schemas/Gender'
+        age:
+          type: integer
+          format: int32
+          description: Возраст пропавшего человека в полных годах
+          minimum: 0
+          maximum: 150
+        specialSigns:
+          type: string
+          description: Особые приметы пропавшего человека
+          minLength: 1
+          maxLength: 2000
+        clothing:
+          type: string
+          description: Описание одежды пропавшего человека
+          minLength: 1
+          maxLength: 2000
+        photoUrl:
+          type: string
+          format: uri
+          description: Ссылка на фотографию пропавшего человека
+    IncidentVolunteerLocation:
+      type: object
+      description: Идентификатор участвующего в поиске волонтёра и его текущие координаты при наличии
+      required:
+        - volunteerId
+      properties:
+        volunteerId:
+          $ref: '#/components/schemas/VolunteerId'
+        location:
+          $ref: '#/components/schemas/GeoPoint'
+    Gender:
+      $ref: 'common.yaml#/components/schemas/Gender'
+    Latitude:
+      $ref: 'common.yaml#/components/schemas/Latitude'
+    Longitude:
+      $ref: 'common.yaml#/components/schemas/Longitude'
+    GeoPoint:
+      $ref: 'common.yaml#/components/schemas/GeoPoint'
+    IncidentId:
+      $ref: 'common.yaml#/components/schemas/IncidentId'
+    SettlementInfo:
+      $ref: 'common.yaml#/components/schemas/SettlementInfo'
+    VolunteerId:
+      type: string
+      format: uuid
+      description: Идентификатор волонтёра
+    IncidentStatus:
+      type: string
+      description: Текущий статус инцидента
+      enum:
+        - IN_PROGRESS
+        - SUCCESS
+        - FAIL
+    IncidentFinalStatus:
+      type: string
+      description: Итоговый статус инцидента
+      enum:
+        - SUCCESS
+        - FAIL
+    IncidentCreateResponse:
+      type: object
+      description: Результат создания инцидента
+      required:
+        - incidentId
+      properties:
+        incidentId:
+          $ref: '#/components/schemas/IncidentId'
+    IncidentStatusUpdateRequest:
+      type: object
+      description: Запрос на изменение статуса инцидента
+      required:
+        - incidentId
+        - status
+      properties:
+        incidentId:
+          $ref: '#/components/schemas/IncidentId'
+        status:
+          $ref: '#/components/schemas/IncidentFinalStatus'
+    IncidentCreateRequest:
+      description: Информация о пропавшем человеке и месте его последнего обнаружения
+      allOf:
+        - $ref: '#/components/schemas/MissingPersonInfo'
+        - $ref: '#/components/schemas/LastSeenInfo'
+    LastSeenInfo:
+      description: Информация о месте и времени последнего обнаружения человека
+      allOf:
+        - $ref: '#/components/schemas/SettlementInfo'
+        - type: object
+          required:
+            - lastSeenAt
+            - lastSeenLocation
+            - settlementName
+          properties:
+            lastSeenAt:
+              type: string
+              format: date-time
+              description: Дата и время, когда человека видели в последний раз
+            lastSeenLocation:
+              $ref: '#/components/schemas/GeoPoint'
