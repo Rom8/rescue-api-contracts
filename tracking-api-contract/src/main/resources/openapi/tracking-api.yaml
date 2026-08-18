@@ -123,21 +123,17 @@ paths:
 components:
   schemas:
     VolunteerLocationRequest:
-      type: object
       description: Текущие координаты волонтёра
-      required:
-        - volunteerId
-        - lat
-        - lon
-      properties:
-        volunteerId:
-          type: string
-          format: uuid
-          description: Идентификатор волонтёра
-        lat:
-          $ref: '#/components/schemas/Latitude'
-        lon:
-          $ref: '#/components/schemas/Longitude'
+      allOf:
+        - $ref: '#/components/schemas/GeoPoint'
+        - type: object
+          required:
+            - volunteerId
+          properties:
+            volunteerId:
+              type: string
+              format: uuid
+              description: Идентификатор волонтёра
     TrackingRectangleRequest:
       type: object
       description: Координаты левой верхней и правой нижней границ прямоугольника
@@ -160,22 +156,18 @@ components:
           $ref: '#/components/schemas/Longitude'
           description: Долгота правой нижней границы прямоугольника
     NearestVolunteerLocationsRequest:
-      type: object
       description: Координаты для поиска и количество ближайших волонтёров
-      required:
-        - number
-        - lat
-        - lon
-      properties:
-        number:
-          type: integer
-          format: int32
-          minimum: 1
-          description: Количество ближайших волонтёров для поиска
-        lat:
-          $ref: '#/components/schemas/Latitude'
-        lon:
-          $ref: '#/components/schemas/Longitude'
+      allOf:
+        - $ref: '#/components/schemas/GeoPoint'
+        - type: object
+          required:
+            - number
+          properties:
+            number:
+              type: integer
+              format: int32
+              minimum: 1
+              description: Количество ближайших волонтёров для поиска
     VolunteerLocationListRequest:
       type: object
       description: Список идентификаторов волонтёров для поиска текущих координат
@@ -203,6 +195,8 @@ components:
           $ref: '#/components/schemas/Latitude'
         lon:
           $ref: '#/components/schemas/Longitude'
+    GeoPoint:
+      $ref: 'common.yaml#/components/schemas/GeoPoint'
     Latitude:
       $ref: 'common.yaml#/components/schemas/Latitude'
     Longitude:

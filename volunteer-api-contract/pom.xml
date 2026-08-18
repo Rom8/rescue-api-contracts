@@ -12,4 +12,43 @@
 
     <artifactId>volunteer-api-contract</artifactId>
     <name>Volunteer API contract</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>ru.rom8.rescue</groupId>
+            <artifactId>common-api-contract</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>${maven-dependency-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>unpack-common-openapi</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>ru.rom8.rescue</groupId>
+                                    <artifactId>common-api-contract</artifactId>
+                                    <version>${project.version}</version>
+                                    <includes>openapi/common.yaml</includes>
+                                    <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
 </project>

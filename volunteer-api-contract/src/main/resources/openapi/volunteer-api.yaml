@@ -230,8 +230,7 @@ components:
         - action
       properties:
         incidentId:
-          type: string
-          format: uuid
+          $ref: '#/components/schemas/IncidentId'
         action:
           $ref: '#/components/schemas/VolunteerIncidentAction'
     VolunteerIncidentAction:
@@ -241,112 +240,99 @@ components:
         - ACCEPT
         - REJECT
     VolunteerRegisterRequest:
-      type: object
-      required:
-        - familyName
-        - firstName
-        - gender
-        - phoneNumber
-        - email
-        - birthDate
-        - settlementName
-      properties:
-        familyName:
-          type: string
-          maxLength: 100
-        firstName:
-          type: string
-          maxLength: 100
-        patronymic:
-          type: string
-          maxLength: 100
-        gender:
-          $ref: '#/components/schemas/Gender'
-        phoneNumber:
-          type: string
-          maxLength: 255
-        email:
-          type: string
-          format: email
-          maxLength: 255
-        birthDate:
-          type: string
-          format: date
-        settlementName:
-          type: string
-          maxLength: 255
-        settlementDistrictName:
-          type: string
-          maxLength: 255
+      allOf:
+        - $ref: '#/components/schemas/SettlementInfo'
+        - type: object
+          required:
+            - familyName
+            - firstName
+            - gender
+            - phoneNumber
+            - email
+            - birthDate
+            - settlementName
+          properties:
+            familyName:
+              type: string
+              maxLength: 100
+            firstName:
+              type: string
+              maxLength: 100
+            patronymic:
+              type: string
+              maxLength: 100
+            gender:
+              $ref: '#/components/schemas/Gender'
+            phoneNumber:
+              type: string
+              maxLength: 255
+            email:
+              type: string
+              format: email
+              maxLength: 255
+            birthDate:
+              type: string
+              format: date
     VolunteerUpdateRequest:
-      type: object
-      properties:
-        familyName:
-          type: string
-          maxLength: 100
-        firstName:
-          type: string
-          maxLength: 100
-        patronymic:
-          type: string
-          maxLength: 100
-        phoneNumber:
-          type: string
-          maxLength: 255
-        email:
-          type: string
-          format: email
-          maxLength: 255
-        settlementName:
-          type: string
-          maxLength: 255
-        settlementDistrictName:
-          type: string
-          maxLength: 255
+      allOf:
+        - $ref: '#/components/schemas/SettlementInfo'
+        - type: object
+          properties:
+            familyName:
+              type: string
+              maxLength: 100
+            firstName:
+              type: string
+              maxLength: 100
+            patronymic:
+              type: string
+              maxLength: 100
+            phoneNumber:
+              type: string
+              maxLength: 255
+            email:
+              type: string
+              format: email
+              maxLength: 255
     VolunteerDto:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-        createDate:
-          type: string
-          format: date-time
-        updateDate:
-          type: string
-          format: date-time
-        userId:
-          type: string
-        firstName:
-          type: string
-        familyName:
-          type: string
-        patronymic:
-          type: string
-        gender:
-          $ref: '#/components/schemas/Gender'
-        birthDate:
-          type: string
-          format: date
-        status:
-          $ref: '#/components/schemas/VolunteerStatus'
-        locationId:
-          type: integer
-          format: int64
-        settlementName:
-          type: string
-          maxLength: 255
-        settlementDistrictName:
-          type: string
-          maxLength: 255
-        currentIncidentId:
-          type: string
-          format: uuid
-        contacts:
-          type: array
-          uniqueItems: true
-          items:
-            $ref: '#/components/schemas/ContactInfoDto'
+      allOf:
+        - $ref: '#/components/schemas/SettlementInfo'
+        - type: object
+          properties:
+            id:
+              type: integer
+              format: int64
+            createDate:
+              type: string
+              format: date-time
+            updateDate:
+              type: string
+              format: date-time
+            userId:
+              type: string
+            firstName:
+              type: string
+            familyName:
+              type: string
+            patronymic:
+              type: string
+            gender:
+              $ref: '#/components/schemas/Gender'
+            birthDate:
+              type: string
+              format: date
+            status:
+              $ref: '#/components/schemas/VolunteerStatus'
+            locationId:
+              type: integer
+              format: int64
+            currentIncidentId:
+              $ref: '#/components/schemas/IncidentId'
+            contacts:
+              type: array
+              uniqueItems: true
+              items:
+                $ref: '#/components/schemas/ContactInfoDto'
     ContactInfoDto:
       type: object
       properties:
@@ -367,10 +353,11 @@ components:
           type: integer
           format: int64
     Gender:
-      type: string
-      enum:
-        - MALE
-        - FEMALE
+      $ref: 'common.yaml#/components/schemas/Gender'
+    IncidentId:
+      $ref: 'common.yaml#/components/schemas/IncidentId'
+    SettlementInfo:
+      $ref: 'common.yaml#/components/schemas/SettlementInfo'
     VolunteerStatus:
       type: string
       enum:
