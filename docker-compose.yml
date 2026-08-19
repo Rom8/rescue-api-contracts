@@ -6,12 +6,14 @@ services:
     environment:
       URLS: >-
         [
+          {"name":"Incident API","url":"/openapi/incident-api.yaml"},
+          {"name":"Tracking API","url":"/openapi/tracking-api.yaml"},
           {"name":"Volunteer API","url":"/openapi/volunteer-api.yaml"},
-          {"name":"Tracking API","url":"/openapi/tracking-api.yaml"}
         ]
     ports:
       - "${SWAGGER_UI_PORT:-8091}:8080"
     volumes:
+      - ./incident-api-contract/src/main/resources/openapi/incident-api.yaml:/usr/share/nginx/html/openapi/incident-api.yaml:ro
       - ./volunteer-api-contract/src/main/resources/openapi/volunteer-api.yaml:/usr/share/nginx/html/openapi/volunteer-api.yaml:ro
       - ./tracking-api-contract/src/main/resources/openapi/tracking-api.yaml:/usr/share/nginx/html/openapi/tracking-api.yaml:ro
       - ./common-api-contract/src/main/resources/openapi/common.yaml:/usr/share/nginx/html/openapi/common.yaml:ro
